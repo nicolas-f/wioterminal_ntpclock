@@ -1,3 +1,26 @@
+/*
+ An example digital clock using a TFT LCD screen to show the time.
+ Demonstrates use of the font printing routines. (Time updates but date does not.)
+ It uses the time of NTP server gathered with wifi.
+ Make sure all the display driver and pin comnenctions are correct by
+ editting the User_Setup.h file in the TFT_eSPI library folder.
+ Based on clock sketch by Gilchrist 6/2/2014 1.0
+A few colour codes:
+code  color
+0x0000  Black
+0xFFFF  White
+0xBDF7  Light Gray
+0x7BEF  Dark Gray
+0xF800  Red
+0xFFE0  Yellow
+0xFBE0  Orange
+0x79E0  Brown
+0x7E0 Green
+0x7FF Cyan
+0x1F  Blue
+0xF81F  Pink
+ */
+
 #include "AtWiFi.h"    // https://wiki.seeedstudio.com/Wio-Terminal-Network-Overview/#libraries-installation
 #include "settings.h"
 // This file contains
