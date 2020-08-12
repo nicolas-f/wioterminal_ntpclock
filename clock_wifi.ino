@@ -60,7 +60,6 @@ void setup() {
 
   tft.setTextSize(1);
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-  while(!Serial); // Wait for Serial to be ready
   delay(1000);
 
   // Set WiFi to station mode and disconnect from an AP if it was previously connected
