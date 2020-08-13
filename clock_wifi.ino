@@ -38,7 +38,6 @@ code  color
 
 TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
 
-static uint8_t conv2d(const char* p); // Forward declaration needed for IDE 1.6.x
 
 uint8_t hh = -99, mm = -99, ss = -99;
 
@@ -48,9 +47,12 @@ unsigned int colour = 0;
 
 
 uint32_t targetTime = 0;                    // for next 1 second timeout
+int minUpdateInterval = 64000;
+int maxUpdateInterval = 1024000;
+int updateInterval = minUpdateInterval;
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 7200, 3600000);
+NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 7200, updateInterval);
  
 void setup() {
   Serial.begin(115200);
@@ -84,8 +86,25 @@ void loop() {
   if (targetTime < millis()) {
     // Set next update for 1 second later
     targetTime = millis() + 1000;
+
+    unsigned long oldOffset = timeClient.getEpochTime() - millis();
+    if(timeClient.update()) {
+      // Tune the poll interval in order to keep error < 1 second when synchronizing.
+      unsigned long newOffset = timeClient.getEpochTime() - millis();
+      Serial.print("Offset: ");
+      Serial.print(labs(newOffset-oldOffset));
+      Serial.println(" ms");
+      if(labs(newOffset-oldOffset) > 1000) {
+        updateInterval = max(minUpdateInterval, updateInterval - (updateInterval - minUpdateInterval) / 2);
+      } else {
+        // increase sync interval
+        updateInterval = min(maxUpdateInterval, updateInterval + (maxUpdateInterval - updateInterval) / 2);        
+      }
+      Serial.print("Set update interval to ");
+      Serial.println(updateInterval);
+      timeClient.setUpdateInterval(updateInterval);
+    }
     
-    timeClient.update();
     //Serial.println(timeClient.getFormattedTime());
     // parse time
     hh = timeClient.getHours();
